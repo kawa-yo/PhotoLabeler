@@ -172,6 +172,8 @@ public class RadioPanel extends BorderPanel
 	protected JList<RadioButton> list;
 	protected ButtonGroup group;
 
+	private JButton settingButton;
+	private Image settingImage = Imager.getImage(RadioPanel.class.getResource("../settings.png"));
 	
 	public RadioPanel()
 	{
@@ -186,16 +188,13 @@ public class RadioPanel extends BorderPanel
 		setCenter(list);
 		group = new ButtonGroup();
 		
-		list.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e)
-			{
-				if( SwingUtilities.isRightMouseButton(e) )
-				{
-					new EditDialog();
-				}
-			}
+		settingButton = new JButton(new ImageIcon(settingImage));
+		settingButton.addActionListener(e -> {
+			new EditDialog();
 		});
-		
+		setTop(new FlowPanel(FlowLayout.RIGHT, new Component[] {
+				settingButton
+		}));
 	}
 	
 	public void addRadioButton(RadioButton button)
