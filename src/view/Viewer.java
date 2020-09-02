@@ -29,7 +29,8 @@ public class Viewer extends JPanel
 {
 	private Main contents;
 	private JLabel view;
-	private JLabel label;
+	private JLabel title;
+	private JLabel subTitle;
 	private Photo photo;
 	
 	private RadioPanel radios;
@@ -71,10 +72,15 @@ public class Viewer extends JPanel
 		loadPrefs();
 
 		view = new JLabel();
-		label = new JLabel();
-		label.setHorizontalAlignment(SwingConstants.CENTER);
+		title = new JLabel();
+		title.setHorizontalAlignment(SwingConstants.CENTER);
+		subTitle = new JLabel();
+		subTitle.setHorizontalAlignment(SwingConstants.CENTER);
 		add(view, BorderLayout.CENTER);
-		add(label, BorderLayout.PAGE_END);
+		JPanel panel = new JPanel(new BorderLayout());
+		panel.add(subTitle, BorderLayout.PAGE_START);
+		panel.add(title, BorderLayout.PAGE_END);
+		add(panel, BorderLayout.PAGE_END);
 		add(radios, BorderLayout.LINE_END);
 		addMouseWheelListener(new MouseWheelListener() {
 			public void	mouseWheelMoved(MouseWheelEvent e)
@@ -128,7 +134,9 @@ public class Viewer extends JPanel
 		this.photo = photo;
 		ImageIcon icon = new StretchIcon(photo.getImage());
 		view.setIcon(icon);
-		label.setText( ( new File(photo.getSource()) ).getName() );
+		File file = new File(photo.getSource());
+		subTitle.setText("[" + file.getParentFile().getName() + "]");
+		title.setText(file.getName());
 		load(photo);
 	}
 	

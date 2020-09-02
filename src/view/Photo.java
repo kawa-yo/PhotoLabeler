@@ -6,6 +6,7 @@ import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.util.List;
 import java.util.Map;
 import java.util.prefs.Preferences;
 
@@ -19,6 +20,7 @@ import javax.swing.border.Border;
 import ext.StretchIcon;
 import main.Main;
 import utils.Imager;
+import utils.RadioButton;
 
 public class Photo extends JPanel
 {
@@ -76,19 +78,17 @@ public class Photo extends JPanel
 		File file = new File(src);
 		Image image = Imager.getScaledImage(file, width, height);
 		view.setIcon(new StretchIcon(image));
-		title.setText(file.getName());
+		title.setText("[" + file.getParentFile().getName() + "]" + file.getName());
 		loaded = true;
 	}
 	
-	public void loadPrefs()
+	public void loadPrefs(Viewer viewer)
 	{
 		Preferences prefs = Preferences.userRoot().node(prefPath);
-		label = prefs.get(LABEL_KEY, "-- no selection --");
-	}
-	
-	public void loadPrefs(Map<String, Color> label2color)
-	{
-		this.loadPrefs();
+		Map<String, Color> label2color = viewer.getLabelToColor();
+		List<RadioButton> buttonList = viewer.getRadioPanel().getButtonList();
+		String defaultLabel = (buttonList.size() > 0 ? buttonList.get(0).getText() : "-- no selection --");
+		label = prefs.get(LABEL_KEY, defaultLabel);
 		if( label2color.containsKey(label) )
 		{
 			view.setBackground(label2color.get(label));

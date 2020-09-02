@@ -136,7 +136,7 @@ public class Library extends JPanel implements MouseWheelListener
 			if( !photo.isLoaded() )
 			{
 				photo.load();
-				photo.loadPrefs(contents.getViewer().getLabelToColor());
+				photo.loadPrefs(contents.getViewer());
 				revalidate();
 				repaint();
 			}
@@ -182,6 +182,7 @@ public class Library extends JPanel implements MouseWheelListener
 		next.setActive(true);
 		if( !next.isLoaded() ) next.load();
 		contents.getViewer().setPhoto(next);
+		contents.getViewer().getRadioPanel().setSelected(next.getLabel());
 		scrollToVisible(next);
 	}
 

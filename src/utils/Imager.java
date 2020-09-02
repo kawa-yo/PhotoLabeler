@@ -12,7 +12,7 @@ import javax.imageio.ImageIO;
 
 public class Imager
 {
-	public static BufferedImage broken_image = getImage(Imager.class.getResource("../broken_icon.png"));
+	public static BufferedImage broken_image = getImage(Imager.class.getResource("/broken_icon.png"));
 	
 
 	public static BufferedImage getImage(Object obj)

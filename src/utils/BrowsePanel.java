@@ -14,6 +14,11 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class BrowsePanel extends JPanel
 {
+	public static final int OPEN_MODE = 0;
+	public static final int SAVE_MODE = 1;
+
+	private int mode = OPEN_MODE;
+
 	protected JTextField field;
 	protected JButton button;
 	private JFileChooser chooser;
@@ -21,22 +26,9 @@ public class BrowsePanel extends JPanel
 
 	public BrowsePanel()
 	{
-		// super(new GridBagLayout());
-
-		// GridBagConstraints fieldGBC = new GridBagConstraints();
-		// fieldGBC.weightx = 1.0;
-		// fieldGBC.gridwidth = GridBagConstraints.RELATIVE;
-		// fieldGBC.fill = GridBagConstraints.HORIZONTAL;
-		// fieldGBC.insets = new Insets(2,2,2,2);
-
-		// GridBagConstraints buttonGBC = new GridBagConstraints();
-		// buttonGBC.weightx = 0.0;
-		// buttonGBC.gridwidth = GridBagConstraints.REMAINDER;
-		// buttonGBC.insets = new Insets(2,2,2,2);
-
 		super(new BorderLayout());
 
-		field = new JTextField();
+		field = new JTextField(30);
 		field.setEditable(false);
 		add(field, BorderLayout.CENTER);
 		// add(field, fieldGBC);
@@ -57,6 +49,12 @@ public class BrowsePanel extends JPanel
 		chooser.setFileFilter(new FileNameExtensionFilter(exp, fileFormat));
 	}
 	
+	public BrowsePanel(String fileFormat, int mode)
+	{
+		this(fileFormat);
+		this.mode = mode;
+	}
+	
 	public void fullAction(ActionEvent e)
 	{
 		File file = browse();
@@ -75,7 +73,16 @@ public class BrowsePanel extends JPanel
 	public File browse()
 	{
 		File file = null;
-		if( chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION )
+		int option;
+		if( mode == SAVE_MODE )
+		{
+			option = chooser.showSaveDialog(null);
+		}
+		else
+		{
+			option = chooser.showOpenDialog(null);
+		}
+		if( option == JFileChooser.APPROVE_OPTION )
 		{
 			file = chooser.getSelectedFile();
 			String path = file.toString();

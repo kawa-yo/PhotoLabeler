@@ -10,23 +10,23 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.AbstractAction;
 import javax.swing.ButtonGroup;
-import javax.swing.ButtonModel;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
+import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -34,7 +34,7 @@ public class RadioPanel extends BorderPanel
 {
 	public class EditDialog extends JFrame
 	{
-		public Image trash = Imager.getImage(RadioPanel.class.getResource("../delete.png"));
+		public Image trash = Imager.getImage(RadioPanel.class.getResource("/delete.png"));
 
 		public class ColorButton extends JButton
 		{
@@ -69,10 +69,20 @@ public class RadioPanel extends BorderPanel
 			{
 				return color;
 			}
-		}
-		private JTextField labelField;
-		private JTextField colorField;
 
+			public ImageIcon createIcon(Color main, int width, int height)
+			{
+			    BufferedImage image = new BufferedImage(width, height, java.awt.image.BufferedImage.TYPE_INT_RGB);
+			    Graphics2D graphics = image.createGraphics();
+			    graphics.setColor(main);
+			    graphics.fillRect(0, 0, width, height);
+			    graphics.setXORMode(Color.DARK_GRAY);
+			    graphics.drawRect(0, 0, width-1, height-1);
+			    image.flush();
+			    ImageIcon icon = new ImageIcon(image);
+			    return icon;
+			}
+		}
 		private GridBagConstraints titleGBC;
 		private GridBagConstraints middleGBC;
 		private GridBagConstraints lastGBC;
@@ -173,7 +183,7 @@ public class RadioPanel extends BorderPanel
 	protected ButtonGroup group;
 
 	private JButton settingButton;
-	private Image settingImage = Imager.getImage(RadioPanel.class.getResource("../settings.png"));
+	private Image settingImage = Imager.getImage(RadioPanel.class.getResource("/settings.png"));
 	
 	public RadioPanel()
 	{
@@ -197,6 +207,28 @@ public class RadioPanel extends BorderPanel
 		}));
 	}
 	
+	public void keyBinding()
+	{
+		for( int i=0; i<10; i++ )
+		{
+			final int index = i;
+			String key = Integer.toString(i);
+			getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(key), key);
+			getActionMap().put(key, new AbstractAction() {
+				public void actionPerformed(ActionEvent e)
+				{
+					DefaultListModel<RadioButton> model = (DefaultListModel<RadioButton>) list.getModel();
+					if( model.getSize() > index )
+					{
+						RadioButton button = model.getElementAt(index);
+						button.setSelected(true);
+						repaint();
+					}
+				}
+			});
+		}
+	}
+	
 	public void addRadioButton(RadioButton button)
 	{
 		DefaultListModel<RadioButton> model = (DefaultListModel<RadioButton>) list.getModel();
@@ -211,53 +243,6 @@ public class RadioPanel extends BorderPanel
 		group.remove(button);
 	}
 	
-	public RadioButton getSelected()
-	{
-		ButtonModel bm = group.getSelection();
-		if( bm != null )
-		{
-			Object[] objects = bm.getSelectedObjects();
-			if( objects != null )
-			{
-				return (RadioButton) objects[0];
-			}
-		}
-		return null;
-	}
-	
-	public void setSelected(int id)
-	{
-		DefaultListModel<RadioButton> model = (DefaultListModel<RadioButton>) list.getModel();
-		if( 0 <= id && id < model.getSize() )
-		{
-			RadioButton button = model.elementAt(id);
-			button.setSelected(true);
-		}
-		else
-		{
-			RadioButton button = getSelected();
-			System.out.println(button);
-			if( button != null )
-			{
-				button.setSelected(true);
-			}
-		}
-		System.out.println(id + " selected");
-	}
-
-	public ImageIcon createIcon(Color main, int width, int height)
-	{
-	    BufferedImage image = new BufferedImage(width, height, java.awt.image.BufferedImage.TYPE_INT_RGB);
-	    Graphics2D graphics = image.createGraphics();
-	    graphics.setColor(main);
-	    graphics.fillRect(0, 0, width, height);
-	    graphics.setXORMode(Color.DARK_GRAY);
-	    graphics.drawRect(0, 0, width-1, height-1);
-	    image.flush();
-	    ImageIcon icon = new ImageIcon(image);
-	    return icon;
-	}
-
 	public List<RadioButton> getButtonList()
 	{
 		List<RadioButton> buttonlist = new ArrayList<>();
@@ -267,5 +252,26 @@ public class RadioPanel extends BorderPanel
 			buttonlist.add(model.getElementAt(i));
 		}
 		return buttonlist;
+	}
+	
+	public void setSelected(String text)
+	{
+		DefaultListModel<RadioButton> model = (DefaultListModel<RadioButton>) list.getModel();
+		RadioButton selected = null;
+		for( int i=0; i<model.getSize(); i++ )
+		{
+			RadioButton button = model.getElementAt(i);
+			if( button.getText().equals(text) )
+			{
+				selected = button;
+				break;
+			}
+		}
+
+		if( selected != null )
+		{
+			selected.setSelected(true);
+		}
+		repaint();
 	}
 }

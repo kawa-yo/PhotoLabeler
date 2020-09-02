@@ -48,10 +48,10 @@ public class FileTree extends JPanel
 			File file = browse();
 			if( file != null )
 			{
-				field.setText(file.toString());
-				loadTree(file);
+				action(file);
 			}
 		});
+		
 		panel1.add(field, BorderLayout.CENTER);
 		panel1.add(button, BorderLayout.LINE_END);
 		add(panel1, BorderLayout.PAGE_START);
@@ -85,7 +85,12 @@ public class FileTree extends JPanel
 		((DefaultTreeModel)filetree.getModel()).setRoot(null);
 		panel2_1.add(filetree);
 	}
-	
+
+	public void action(File file)
+	{
+		field.setText(file.toString());
+		loadTree(file);
+	}
 	
 	public File browse()
 	{

@@ -22,6 +22,7 @@ public class BorderPanel extends JPanel
 	
 	public BorderPanel(Component top, Component left, Component center, Component right, Component bottom)
 	{
+		super();
 		setContents(top, left, center, right, bottom);
 	}
 	

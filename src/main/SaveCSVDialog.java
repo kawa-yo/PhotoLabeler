@@ -2,21 +2,17 @@ package main;
 
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Vector;
 
-import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.border.EmptyBorder;
 
 import utils.BorderPanel;
 import utils.BrowsePanel;
 import utils.Empty;
-import utils.FlowPanel;
-import utils.RadioPanel;
 import utils.TablePanel;
 import view.Library;
 import view.Photo;
@@ -26,19 +22,21 @@ public class SaveCSVDialog extends JFrame
 	private boolean loaded = false;
 	private TablePanel tablePanel;
 	private BrowsePanel browsePanel;
-	
-	private JButton saveButton;
-	private JButton cancelButton;
 
 	public SaveCSVDialog(File dir, Library library)
 	{
 		tablePanel = new TablePanel(new Dimension(500, 200));
-		browsePanel = new BrowsePanel("csv");
+		tablePanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+		browsePanel = new BrowsePanel("csv", BrowsePanel.SAVE_MODE) {
+			@Override
+			public void action(File file)
+			{
+				save();
+				SaveCSVDialog.this.setVisible(false);
+			}
+		};
 		browsePanel.setInitialDirectory(dir);
-		saveButton = new JButton("save");
-		cancelButton = new JButton("cancel");
-		saveButton.addActionListener(e -> save());
-		cancelButton.addActionListener(e -> setVisible(false));
+		browsePanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 		
 		BorderPanel panel = new BorderPanel();
 		getContentPane().add(panel);
@@ -46,18 +44,9 @@ public class SaveCSVDialog extends JFrame
 		panel.setContents(
 				new Empty(),
 				new Empty(),
-				new BorderPanel(
-						new Empty(),
-						new Empty(),
-						tablePanel,
-						new Empty(),
-						browsePanel
-				),
+				tablePanel,
 				new Empty(),
-				new FlowPanel(FlowLayout.RIGHT, new Component[] {
-						saveButton,
-						cancelButton
-				})
+				browsePanel
 		);
 		load(library.getComponents());
 
@@ -74,7 +63,7 @@ public class SaveCSVDialog extends JFrame
 		{
 			Photo photo = (Photo) c;
 			File file = new File(photo.getSource());
-			data[cnt][0] = file.getName();
+			data[cnt][0] = file.getParentFile().getName() + "/" + file.getName();
 			data[cnt][1] = photo.getLabel();
 			cnt++;
 		}
