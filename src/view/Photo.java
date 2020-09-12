@@ -2,6 +2,7 @@ package view;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -30,8 +31,10 @@ public class Photo extends JPanel
 	public static final Color activecolor = new Color(255, 128, 128);
 	public static final Color inactivecolor = new Color(240, 240, 240);
 	public static final int viewpad = 2;
-	public static final Border activeBorder = BorderFactory.createLineBorder(Color.red);
-	public static final Border inactiveBorder = BorderFactory.createLineBorder(Color.white);
+	public static final Border activeBorder = BorderFactory.createLineBorder(activecolor, 3);
+	public static final Border inactiveBorder = BorderFactory.createLineBorder(inactivecolor, 3);
+	public static final Font activeFont = new Font("Serif", Font.BOLD, 14);
+	public static final Font inactiveFont = new Font("Serif", Font.PLAIN, 12);
 
 	private JLabel view;
 	private JLabel title;
@@ -51,7 +54,10 @@ public class Photo extends JPanel
 	{
 		super(new BorderLayout());
 		src = file.toString();
-		prefPath = Main.rootNodeName + toLinuxPath(src.toString());
+		prefPath = toPreferencePath(src);
+		System.out.println();
+		System.out.println(prefPath);
+		setBackground(Color.white);
 		
 		view = new JLabel();
 		view.setBorder(BorderFactory.createEmptyBorder(viewpad, viewpad, viewpad, viewpad));
@@ -70,6 +76,7 @@ public class Photo extends JPanel
 				}
 			}
 		});
+		setActive(false);
 	}
 	
 	public void load()
@@ -101,7 +108,38 @@ public class Photo extends JPanel
 		prefs.put(LABEL_KEY, label);
 	}
 	
-	public String toLinuxPath(String path)
+	public String toPreferencePath(String src)
+	{
+		String orgpath = toLinuxPath(src.toString());
+		String[] nodes = orgpath.split("/");
+		String path = "";
+		for( int i=1; i<nodes.length; i++ )
+		{
+			String add = "/" + insertSlash(nodes[i], 80);
+			System.out.println(add);
+			path += add;
+		}
+		return Main.rootNodeName + path;
+	}
+	
+	public static String insertSlash(String org, int length)
+	{
+		int n = (org.length() - 1) / length + 1;
+		String out = "";
+		for( int i=0; i<n; i++ )
+		{
+			int start = i * length;
+			int end = Math.min(org.length(), (i + 1) * length);
+			if( i != 0 )
+			{
+				out += "/";
+			}
+			out += org.substring(start, end);
+		}
+		return out;
+	}
+	
+	public static String toLinuxPath(String path)
 	{
 		if( !System.getProperty("file.separator").equals("/") )
 		{
@@ -116,10 +154,14 @@ public class Photo extends JPanel
 		if( active )
 		{
 			setBorder(activeBorder);
+			setBackground(activecolor);
+			title.setFont(activeFont);
 		}
 		else
 		{
 			setBorder(inactiveBorder);
+			setBackground(inactivecolor);
+			title.setFont(inactiveFont);
 		}
 	}
 	
@@ -159,4 +201,16 @@ public class Photo extends JPanel
 	{
 		return label;
 	}
+	
+	
+	// public static void main(String[] args)
+	// {
+	// 	String in = "test_test_test_test_test_test_test_test_test_test_test_test_test_test_test_test_test_test_test_test_";
+	// 	String out = insertSlash(in, 80);
+	// 	System.out.println("out: " + out);
+	// 	
+	// 	in = "home";
+	// 	out = insertSlash(in, 80);
+	// 	System.out.println("out: " + out);
+	// }
 }

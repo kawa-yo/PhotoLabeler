@@ -36,6 +36,7 @@ public class Main extends JFrame
 {
 	public static final String rootNodeName = "/PhotoLabeler";
 	public static final String DIRECTORY_KEY = "DIRECTORY";
+	public static final String COLUMN_NUM_KEY = "COLUMN_NUM";
 
 	private MenuBar menubar;
 	private TimerMenu timerMenu;
@@ -45,21 +46,20 @@ public class Main extends JFrame
 	private BorderPanel mainPanel;
 	
 	
+	
 	public Main()
 	{
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		SwingUtilities.invokeLater(() -> {
-			try {
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			} catch( Exception e ) {
-				e.printStackTrace();
-			}
-			initialize();
-			keyBinding();
-			loadPrefs();
-		}); 
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch( Exception e ) {
+			e.printStackTrace();
+		}
+		initialize();
+		keyBinding();
+		loadPrefs();
 	}
 	
 	public void keyBinding()
@@ -72,6 +72,7 @@ public class Main extends JFrame
 			}
 		});
 		viewer.getRadioPanel().keyBinding();
+		library.keyBinding();
 	}
 	
 	public void save()
@@ -93,6 +94,7 @@ public class Main extends JFrame
 		{
 			filetree.action(file);
 		}
+		Library.ncol = prefs.getInt(COLUMN_NUM_KEY, 1);
 	}
 	
 	public void savePrefs()
@@ -105,6 +107,7 @@ public class Main extends JFrame
 			prefs.put(DIRECTORY_KEY, file.toString());
 		}
 		timerMenu.savePrefs();
+		prefs.putInt(COLUMN_NUM_KEY, Library.ncol);
 	}
 	
 	public void initialize()

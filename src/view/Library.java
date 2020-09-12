@@ -3,6 +3,7 @@ package view;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.ArrayList;
@@ -12,7 +13,10 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.swing.AbstractAction;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 
 import main.Main;
 
@@ -46,6 +50,41 @@ public class Library extends JPanel implements MouseWheelListener
 		indices = new ArrayList<>();
 		
 		addMouseWheelListener(this);
+	}
+	
+	public void keyBinding()
+	{
+		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("UP"), "UP");
+		getActionMap().put("UP", new AbstractAction() {
+			public void actionPerformed(ActionEvent e)
+			{
+				turnPhoto(-ncol);
+			}
+		});
+
+		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("DOWN"), "DOWN");
+		getActionMap().put("DOWN", new AbstractAction() {
+			public void actionPerformed(ActionEvent e)
+			{
+				turnPhoto(+ncol);
+			}
+		});
+
+		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("LEFT"), "LEFT");
+		getActionMap().put("LEFT", new AbstractAction() {
+			public void actionPerformed(ActionEvent e)
+			{
+				turnPhoto(-1);
+			}
+		});
+
+		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("RIGHT"), "RIGHT");
+		getActionMap().put("RIGHT", new AbstractAction() {
+			public void actionPerformed(ActionEvent e)
+			{
+				turnPhoto(+1);
+			}
+		});
 	}
 
 	public void mouseWheelMoved(MouseWheelEvent e)
