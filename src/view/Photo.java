@@ -195,6 +195,7 @@ public class Photo extends JPanel
 		this.label = label;
 		view.setBackground(color);
 		savePrefs();
+		System.out.println(label + " " + color);
 	}
 	
 	public String getLabel()

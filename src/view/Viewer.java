@@ -58,12 +58,19 @@ public class Viewer extends JPanel
 			{
 				super.addRadioButton(button);
 				button.addItemListener(e -> {
-					if( e.getStateChange() == ItemEvent.SELECTED )
+					if( e.getStateChange() == ItemEvent.SELECTED && !button.equals(getSelected()) )
 					{
+						setSelected(button);
 						if( photo != null )
 						{
 							photo.setOptions(button.getText(), button.getColor());
 						}
+					}
+				});
+				button.addActionListener(e -> {
+					if( photo != null )
+					{
+						System.out.println(button.getText() + " action");
 					}
 				});
 			}

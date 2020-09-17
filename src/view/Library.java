@@ -38,16 +38,12 @@ public class Library extends JPanel implements MouseWheelListener
 	
 	private int n_photos = 0;
 	
-	// components indices when sorted by name
-	private List<Integer> indices;
-	
 
 	public Library(Main c)
 	{
 		contents = c;
 		gl = new GridSolidLayout(0, ncol, gap, gap, 200, 200);
 		setLayout(gl);
-		indices = new ArrayList<>();
 		
 		addMouseWheelListener(this);
 	}
@@ -188,7 +184,6 @@ public class Library extends JPanel implements MouseWheelListener
 		{
 			getActive().setActive(false);
 		}
-		indices = new ArrayList<>();
 		removeAll();
 		active = 0;
 		skip = true;

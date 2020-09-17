@@ -11,24 +11,28 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.AbstractAction;
-import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+
+import view.Photo;
 
 public class RadioPanel extends BorderPanel
 {
@@ -179,16 +183,75 @@ public class RadioPanel extends BorderPanel
 			field.requestFocus();
 		}
 	}
+	
+	public class MyButtonGroup
+	{
+		List<RadioLabel> member;
+		private RadioLabel selected;
+		
+		public MyButtonGroup()
+		{
+			member = new ArrayList<>();
+		}
+		public void add(RadioLabel label)
+		{
+			member.add(label);
+			label.addMouseListener(new MouseAdapter() {
+				public void mouseClicked(MouseEvent e)
+				{
+					setSelected(label);
+				}
+			});
+		}
+		public void setSelected(RadioLabel label)
+		{
+			if( selected != null )
+			{
+				selected.setSelected(false);
+			}
+			selected = label;
+			label.setSelected(true);
+		}
+	}
+
+	public class RadioLabel extends JLabel
+	{
+		private boolean selected = false;
+		public RadioLabel(String text)
+		{
+			super(text);
+		}
+		
+		public void setSelected(boolean flag)
+		{
+			selected = flag;
+			if( flag )
+			{
+				setFont(Photo.activeFont);
+			}
+			else
+			{
+				setFont(Photo.inactiveFont);
+			}
+		}
+		
+		public boolean isSelected()
+		{
+			return selected;
+		}
+	}
+
 	protected JList<RadioButton> list;
-	protected ButtonGroup group;
 
 	private JButton settingButton;
 	private Image settingImage = Imager.getImage(RadioPanel.class.getResource("/settings.png"));
+	private RadioButton selected = null;
 	
 	public RadioPanel()
 	{
 		DefaultListModel<RadioButton> model = new DefaultListModel<>();
 		list = new JList<>(model);
+		list.resetKeyboardActions();
 		list.setCellRenderer((list, value, index, selected, focus) -> {
 			value.setBackground(selected? list.getSelectionBackground() : null);
 			value.setSelected(selected);
@@ -196,7 +259,6 @@ public class RadioPanel extends BorderPanel
 		});
 		// list.setFixedCellHeight(30);
 		setCenter(list);
-		group = new ButtonGroup();
 		
 		settingButton = new JButton(new ImageIcon(settingImage));
 		settingButton.addActionListener(e -> {
@@ -221,8 +283,7 @@ public class RadioPanel extends BorderPanel
 					if( model.getSize() > index )
 					{
 						RadioButton button = model.getElementAt(index);
-						button.setSelected(true);
-						repaint();
+						setSelected(button);
 					}
 				}
 			});
@@ -233,14 +294,12 @@ public class RadioPanel extends BorderPanel
 	{
 		DefaultListModel<RadioButton> model = (DefaultListModel<RadioButton>) list.getModel();
 		model.addElement(button);
-		group.add(button);
 	}
 	
 	public void removeRadioButton(RadioButton button)
 	{
 		DefaultListModel<RadioButton> model = (DefaultListModel<RadioButton>) list.getModel();
 		model.removeElement(button);
-		group.remove(button);
 	}
 	
 	public List<RadioButton> getButtonList()
@@ -252,6 +311,22 @@ public class RadioPanel extends BorderPanel
 			buttonlist.add(model.getElementAt(i));
 		}
 		return buttonlist;
+	}
+	
+	public RadioButton getSelected()
+	{
+		return selected;
+	}
+	
+	public void setSelected(RadioButton button)
+	{
+		if( selected != null )
+		{
+			selected.setSelected(false);
+		}
+		button.setSelected(true);
+		selected = button;
+		repaint();
 	}
 	
 	public void setSelected(String text)
@@ -267,11 +342,9 @@ public class RadioPanel extends BorderPanel
 				break;
 			}
 		}
-
 		if( selected != null )
 		{
-			selected.setSelected(true);
+			setSelected(selected);
 		}
-		repaint();
 	}
 }

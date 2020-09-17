@@ -3,6 +3,7 @@ package main;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -15,7 +16,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import file_tree.FileTree;
@@ -29,6 +29,7 @@ import utils.ScrollPanel;
 import utils.SplitPanel;
 import utils.TimerMenu;
 import view.Library;
+import view.Photo;
 import view.Viewer;
 
 
@@ -69,6 +70,14 @@ public class Main extends JFrame
 			public void actionPerformed(ActionEvent e)
 			{
 				save();
+			}
+		});
+		mainPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "ESCAPE");
+		mainPanel.getActionMap().put("ESCAPE", new AbstractAction() {
+			public void actionPerformed(ActionEvent e)
+			{
+				viewer.requestFocus();
+				getContentPane().requestFocus();
 			}
 		});
 		viewer.getRadioPanel().keyBinding();
