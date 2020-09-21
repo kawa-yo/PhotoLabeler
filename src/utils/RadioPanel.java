@@ -11,8 +11,6 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,15 +22,11 @@ import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-
-import view.Photo;
 
 public class RadioPanel extends BorderPanel
 {
@@ -114,12 +108,10 @@ public class RadioPanel extends BorderPanel
 			lastGBC.gridwidth = GridBagConstraints.REMAINDER;
 			lastGBC.insets = new Insets(2,2,2,2);
 			
-			DefaultListModel<RadioLabel> model = group.model;
-			
-			for( int i=0; i<model.getSize(); i++ )
+			for( Component c : list.getComponents() )
 			{
-				RadioLabel label = model.getElementAt(i);
-				addLabel(label);
+				RadioButton button = (RadioButton) c;
+				addLabel(button);
 			}
 			
 			setSize(new Dimension(400, 300));
@@ -132,9 +124,9 @@ public class RadioPanel extends BorderPanel
 			});
 			JButton add = new JButton("Add label");
 			add.addActionListener(e -> {
-				RadioLabel label = new RadioLabel("NEW LABEL", Color.white);
-				addLabel(label);
-				addRadioLabel(label);
+				RadioButton button = new RadioButton("NEW LABEL", Color.white);
+				addLabel(button);
+				addRadioButton(button);
 				panel.revalidate();
 				panel.repaint();
 			});
@@ -145,31 +137,31 @@ public class RadioPanel extends BorderPanel
 			setVisible(true);
 		}
 		
-		public void addLabel(RadioLabel label)
+		public void addLabel(RadioButton button)
 		{
-			ColorButton cbutton = new ColorButton(label.getColor()) {
+			ColorButton cbutton = new ColorButton(button.getColor()) {
 				@Override
 				public void action(Color color)
 				{
-					label.setColor(color);
+					button.setColor(color);
 					RadioPanel.this.repaint();
 					System.out.println(color);
 				}
 			};
-			JTextField field = new JTextField(label.getText());
+			JTextField field = new JTextField(button.getText());
 			field.getDocument().addDocumentListener(new DocumentListener() {
 				public void changedUpdate(DocumentEvent e) { action(); }
 				public void removeUpdate(DocumentEvent e) { action(); }
 				public void insertUpdate(DocumentEvent e) { action(); }
 				public void action()
 				{
-					label.setText(field.getText());
+					button.setText(field.getText());
 					RadioPanel.this.repaint();
 				}
 			});
 			JButton trashButton = new JButton(new ImageIcon(trash));
 			trashButton.addActionListener(e -> {
-				removeRadioLabel(label);
+				removeRadioButton(button);
 				// panel.remove(label);
 				panel.remove(cbutton);
 				panel.remove(field);
@@ -184,65 +176,22 @@ public class RadioPanel extends BorderPanel
 		}
 	}
 	
-	public class MyButtonGroup extends JList<RadioLabel>
-	{
-		DefaultListModel<RadioLabel> model;
-		private RadioLabel selected;
-		
-		public MyButtonGroup()
-		{
-			model = new DefaultListModel<>();
-			setModel(model);
-			setCellRenderer((list, value, index, selected, focus) -> {
-				value.setBackground(selected? list.getSelectionBackground() : null);
-				// value.setSelected(selected);
-				return value;
-			});
-		}
-
-		public void add(RadioLabel label)
-		{
-			model.addElement(label);
-			label.addMouseListener(new MouseAdapter() {
-				public void mouseClicked(MouseEvent e)
-				{
-					setSelected(label);
-				}
-			});
-		}
-		
-		public void remove(RadioLabel label)
-		{
-			model.removeElement(label);
-		}
-		public void setSelected(RadioLabel label)
-		{
-			System.out.println("trying set " + label.getText() + " selected");
-			if( selected != null )
-			{
-				selected.setSelected(false);
-			}
-			selected = label;
-			label.setSelected(true);
-			System.out.println("end");
-		}
-		
-		public RadioLabel getSelected()
-		{
-			return selected;
-		}
-	}
+	protected JPanel list;
+	private GridBagConstraints gbc;
 
 	private JButton settingButton;
 	private Image settingImage = Imager.getImage(RadioPanel.class.getResource("/settings.png"));
-	
-	protected MyButtonGroup group;
+	private RadioButton selected = null;
 	
 	public RadioPanel()
 	{
-		group = new MyButtonGroup();
-		setCenter(group);
-		
+		list = new JPanel(new GridBagLayout());
+		setCenter(list);
+		gbc = new GridBagConstraints();
+		gbc.weightx = 1.0;
+		gbc.gridwidth = GridBagConstraints.REMAINDER;
+		gbc.insets = new Insets(2,2,2,2);
+			
 		settingButton = new JButton(new ImageIcon(settingImage));
 		settingButton.addActionListener(e -> {
 			new EditDialog();
@@ -262,63 +211,72 @@ public class RadioPanel extends BorderPanel
 			getActionMap().put(key, new AbstractAction() {
 				public void actionPerformed(ActionEvent e)
 				{
-					DefaultListModel<RadioLabel> model = group.model;
-					System.out.println(index + "/" + model.getSize() + " entered");
-					if( model.getSize() > index )
+					if( list.getComponents().length > index )
 					{
-						RadioLabel label = model.getElementAt(index);
-						group.setSelected(label);
-						repaint();
+						RadioButton button = (RadioButton) list.getComponent(index);
+						setSelected(button);
 					}
 				}
 			});
 		}
 	}
 	
-	public void addRadioLabel(RadioLabel label)
+	public void addRadioButton(RadioButton button)
 	{
-		group.add(label);
+		list.add(button, gbc);
 	}
 	
-	public void removeRadioLabel(RadioLabel label)
+	public void removeRadioButton(RadioButton button)
 	{
-		group.remove(label);
+		list.remove(button);
 	}
 	
-	public List<RadioLabel> getLabelList()
+	public List<RadioButton> getButtonList()
 	{
-		List<RadioLabel> labels = new ArrayList<>();
-		DefaultListModel<RadioLabel> model = group.model;
-		for( int i=0; i<model.getSize(); i++ )
+		List<RadioButton> buttonlist = new ArrayList<>();
+		for( Component c : list.getComponents() )
 		{
-			labels.add(model.getElementAt(i));
+			buttonlist.add((RadioButton) c);
 		}
-		return labels;
+		return buttonlist;
 	}
 	
-	public RadioLabel getSelected()
+	public RadioButton getSelected()
 	{
-		return group.getSelected();
+		// return group.getSelected();
+		RadioButton selected = null;
+		for( Component c : list.getComponents() )
+		{
+			RadioButton button = (RadioButton) c;
+			if( button.isSelected() )
+			{
+				selected = button;
+				break;
+			}
+		}
+		return selected;
 	}
 	
-	public void setSelected(RadioLabel label)
+	public void setSelected(RadioButton button)
 	{
-		System.out.println("start RadioPanel.setSelected");
-		group.setSelected(label);
+		if( selected != null )
+		{
+			selected.setSelected(false);
+		}
+		button.setSelected(true);
+		selected = button;
 		repaint();
-		System.out.println("end RadioPanel.setSelected");
 	}
 	
 	public void setSelected(String text)
 	{
-		DefaultListModel<RadioLabel> model = group.model;
-		RadioLabel selected = null;
-		for( int i=0; i<model.getSize(); i++ )
+		RadioButton selected = null;
+		for( Component c : list.getComponents() )
 		{
-			RadioLabel label = model.getElementAt(i);
-			if( label.getText().equals(text) )
+			RadioButton button = (RadioButton) c;
+			if( button.getText().equals(text) )
 			{
-				selected = label;
+				selected = button;
 				break;
 			}
 		}
