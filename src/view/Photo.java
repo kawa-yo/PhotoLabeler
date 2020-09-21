@@ -21,7 +21,7 @@ import javax.swing.border.Border;
 import ext.StretchIcon;
 import main.Main;
 import utils.Imager;
-import utils.RadioButton;
+import utils.RadioLabel;
 
 public class Photo extends JPanel
 {
@@ -55,8 +55,6 @@ public class Photo extends JPanel
 		super(new BorderLayout());
 		src = file.toString();
 		prefPath = toPreferencePath(src);
-		System.out.println();
-		System.out.println(prefPath);
 		setBackground(Color.white);
 		
 		view = new JLabel();
@@ -93,8 +91,8 @@ public class Photo extends JPanel
 	{
 		Preferences prefs = Preferences.userRoot().node(prefPath);
 		Map<String, Color> label2color = viewer.getLabelToColor();
-		List<RadioButton> buttonList = viewer.getRadioPanel().getButtonList();
-		String defaultLabel = (buttonList.size() > 0 ? buttonList.get(0).getText() : "-- no selection --");
+		List<RadioLabel> labels = viewer.getRadioPanel().getLabelList();
+		String defaultLabel = (labels.size() > 0 ? labels.get(0).getText() : "-- no selection --");
 		label = prefs.get(LABEL_KEY, defaultLabel);
 		if( label2color.containsKey(label) )
 		{
@@ -116,7 +114,6 @@ public class Photo extends JPanel
 		for( int i=1; i<nodes.length; i++ )
 		{
 			String add = "/" + insertSlash(nodes[i], 80);
-			System.out.println(add);
 			path += add;
 		}
 		return Main.rootNodeName + path;
