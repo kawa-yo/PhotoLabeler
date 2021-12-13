@@ -26,7 +26,7 @@ or
 
 On Linux, if you want to run app by double clicking,
 
-create a file named jdk-14.desktop (jdk 14 version)
+create a file named `jdk-14.desktop` (jdk 14 version) such as
 ```
 [Desktop Entry]
 Name=OpenJDK Java 14 Runtime
@@ -44,5 +44,6 @@ and execute
 $ sudo desktop-file-install jdk-14.desktop
 $ sudo update-desktop-database
 ```
+(then `/usr/share/applications/jdk-14.desktop` is created.)
 
-Note that you cannot use characters '~' or '$' to specify the path.
+Note that you cannot use the characters '~' or '$' to specify the path.
