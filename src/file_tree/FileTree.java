@@ -120,7 +120,7 @@ public class FileTree extends JPanel
 		treethread = new Thread(() -> {
 				TreeNode root = new TreeNode(file);
 				addChildren(root);
-				System.out.println("added");
+				// System.out.println("added");
 				DefaultTreeModel model = (DefaultTreeModel) filetree.getModel();
 				model.setRoot(root);
 		});

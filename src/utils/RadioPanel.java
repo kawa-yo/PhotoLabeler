@@ -243,17 +243,6 @@ public class RadioPanel extends BorderPanel
 	
 	public RadioButton getSelected()
 	{
-		// return group.getSelected();
-		RadioButton selected = null;
-		for( Component c : list.getComponents() )
-		{
-			RadioButton button = (RadioButton) c;
-			if( button.isSelected() )
-			{
-				selected = button;
-				break;
-			}
-		}
 		return selected;
 	}
 	

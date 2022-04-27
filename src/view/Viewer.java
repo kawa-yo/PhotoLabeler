@@ -3,8 +3,7 @@ package view;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Image;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.ItemEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.io.File;
@@ -24,7 +23,6 @@ import ext.StretchIcon;
 import main.Main;
 import utils.Imager;
 import utils.RadioButton;
-import utils.RadioLabel;
 import utils.RadioPanel;
 
 public class Viewer extends JPanel
@@ -56,17 +54,23 @@ public class Viewer extends JPanel
 		contents = c;
 		radios = new RadioPanel() {
 			@Override
-			public void addRadioLabel(RadioLabel label)
+			public void addRadioButton(RadioButton button)
 			{
-				super.addRadioLabel(label);
-				label.addMouseListener(new MouseAdapter() {
-					public void mouseClicked(MouseEvent e)
+				super.addRadioButton(button);
+				button.addItemListener(e -> {
+					if( e.getStateChange() == ItemEvent.SELECTED && !button.equals(getSelected()) )
 					{
-						group.setSelected(label);
+						setSelected(button);
 						if( photo != null )
 						{
-							photo.setOptions(label.getText(), label.getColor());
+							photo.setOptions(button.getText(), button.getColor());
 						}
+					}
+				});
+				button.addActionListener(e -> {
+					if( photo != null )
+					{
+						System.out.println(button.getText() + " action");
 					}
 				});
 			}
@@ -109,11 +113,11 @@ public class Viewer extends JPanel
 			final int id = i;
 
 			Preferences node = prefs.node(Integer.toString(i));
-			String text = node.get(LABEL_KEY, "label " + i);
+			String label = node.get(LABEL_KEY, "label " + i);
 			Color color = new Color(node.getInt(COLOR_KEY, 0x000000));
-			RadioLabel label = new RadioLabel(text, color);
-			radios.addRadioLabel(label);
-			label2color.put(text, color);
+			RadioButton button = new RadioButton(label, color);
+			radios.addRadioButton(button);
+			label2color.put(label, color);
 		}
 	}
 	
@@ -121,14 +125,14 @@ public class Viewer extends JPanel
 	{
 		Preferences prefs = Preferences.userRoot().node(prefPath);
 
-		List<RadioLabel> labels = radios.getLabelList();
-		prefs.putInt(LABEL_NUM_KEY, labels.size());
-		for( int i=0; i<labels.size(); i++ )
+		List<RadioButton> buttonlist = radios.getButtonList();
+		prefs.putInt(LABEL_NUM_KEY, buttonlist.size());
+		for( int i=0; i<buttonlist.size(); i++ )
 		{
 			Preferences node = prefs.node(Integer.toString(i));
-			RadioLabel label = labels.get(i);
-			node.put(LABEL_KEY, label.getText());
-			node.putInt(COLOR_KEY, label.getColor().getRGB());
+			RadioButton button = buttonlist.get(i);
+			node.put(LABEL_KEY, button.getText());
+			node.putInt(COLOR_KEY, button.getColor().getRGB());
 		}
 	}
 	
